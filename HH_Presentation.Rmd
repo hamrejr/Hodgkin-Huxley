@@ -73,7 +73,70 @@ text(x=-40,y=.9, label = "tm")
 ```
 
 
-## HH function with constant external current
+## HH function with constant external current causing action potential
+
+```{r, echo = FALSE}
+
+library( lattice )
+Cm=0.01;    # Membrane Capcitance uF/cm^2
+dt=.04;     # Time Step ms
+I=.007;       #External Current Applied
+ENa=55.17;  # mv Na reversal potential
+EK=-72.14;  # mv K reversal potential
+El=-49.42;  # mv Leakage reversal potential
+gbarNa=1.2; # mS/cm^2 Na conductance
+gbarK=0.36; # mS/cm^2 K conductance
+gbarl=0.003 # mS/cm^2 Leakage conductance
+t=(seq(0,100,by=dt)) #Time Array ms
+
+
+v = -65 # Initial Membrane voltage
+
+    am <- function(v) 0.1*(v+40)/(1-exp(-(v+40)/10))
+    bm <- function(v) 4*exp(-(v+65)/18)
+    ah <- function(v) 0.07*exp(-(v+65)/20)
+    bh <- function(v) 1/(1+exp(-(v+35)/10))
+    an <- function(v) 0.01*(v+55)/(1-exp(-(v+55)/10))
+    bn <- function(v) 0.125*exp(-(v+65)/80)
+    
+  
+
+m=am(v)/(am(v)+bm(v)); # Initial m-value
+n=an(v)/(an(v)+bn(v)); # Initial n-value
+h=ah(v)/(ah(v)+bh(v)); # Initial h-value
+
+
+
+i <- 1
+i=1
+for (i in 1:(length(t)-1)) {
+  
+ m[i+1]=m[i]+dt*((am(v[i])*(1-m[i]))-(bm(v[i])*m[i]))
+ n[i+1]=n[i]+dt*((an(v[i])*(1-n[i]))-(bn(v[i])*n[i]))
+ h[i+1]=h[i]+dt*((ah(v[i])*(1-h[i]))-(bh(v[i])*h[i]))
+ gNa=gbarNa*m[i]^3*h[i]
+ gK=gbarK*n[i]^4
+ gl=gbarl
+
+ INa=gNa*(v[i]-ENa)
+ IK=gK*(v[i]-EK)
+ Il=gl*(v[i]-El)
+
+ 
+ #Euler method to find the next voltage value
+ v[i+1]=v[i]+(dt)*((1/Cm)*(I-(INa+IK+Il)))
+   
+   i = i+dt
+}
+
+x=seq(0,25,by=dt)
+plot(v, xlab="msec", ylab="mVolts", xaxt = "n",pch=19,col="steelblue", type="l", lwd=2)
+axis(1, at=seq(t), labels=c(seq(0,tail(t, n=1),by=dt)))
+
+```
+
+
+## HH function with higher external current causing bifurcation oscillations
 
 ```{r, echo = FALSE}
 
