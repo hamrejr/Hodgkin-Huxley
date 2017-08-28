@@ -1,0 +1,108 @@
+\documentclass{article}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+
+
+<<>>=
+
+
+self.alpha_m = function(v){ 0.1*(-v + 25)/(exp((-v + 25)/10) - 1) }
+self.beta_m = function(v) {4*exp(-v/80)}
+self.inf_m= function(v) {self.alpha_m(v)/(self.alpha_m(v) + self.beta_m(v))}
+
+self.alpha_h = function(v){ 0.07*exp(-v/20)}
+self.beta_h = function(v) {1/(exp((-v+30)/10)+1)}
+self.inf_h= function(v) {self.alpha_h(v)/(self.alpha_h(v) + self.beta_h(v))}
+
+self.alpha_n = function(v){ 0.01*(-v + 10)/(exp((-v + 10)/10) - 1)}
+self.beta_n = function(v) {.125*exp(-v/80)}
+self.inf_n= function(v) {self.alpha_n(v)/(self.alpha_n(v) + self.beta_n(v))}
+
+plot(self.inf_h(seq(-100,200,by=2)),pch=20,col="red", xaxt = "n", ylab = "msec", xlab="Volts")
+axis(1, at=1:200, labels=c(-100:99))
+lines(self.inf_n(seq(-100,200,by=2)),col="green", type="l",lwd=2.5)
+lines(self.inf_m(seq(-100,200,by=2)),col="blue", type = "l", lwd=2.5)
+
+
+
+@
+
+
+<<>>=
+
+self.alpha_h = function(v){ 0.07*exp(-v/20)}
+self.beta_h = function(v) {1/(exp((-v+30)/10)+1)}
+self.inf_ht= function(v) {1/(self.alpha_h(v) + self.beta_h(v))}
+
+self.alpha_n = function(v){ 0.01*(-v + 10)/(exp((-v + 10)/10) - 1)}
+self.beta_n = function(v) {.125*exp(-v/80)}
+self.inf_nt= function(v) {1/(self.alpha_n(v) + self.beta_n(v))}
+
+self.alpha_m = function(v){ 0.1*(-v + 25)/(exp((-v + 25)/10) - 1) }
+self.beta_m = function(v) {4*exp(-v/80)}
+self.inf_mt= function(v) {1/(self.alpha_m(v) + self.beta_m(v))}
+
+ plot(self.inf_ht(seq(-100,100,by=2)),pch=20,col="red", xaxt = "n", ylab = "msec", xlab="Volts")
+axis(1, at=1:100, labels=c(-100:-1))
+lines(self.inf_nt(seq(-100,100,by=2)),col="green", type="l",lwd=2.5)
+lines(self.inf_mt(seq(-100,100,by=2)),col="blue", type = "l", lwd=2.5)
+
+
+
+@
+
+
+
+
+
+<<>>=
+
+
+
+library( lattice )
+Cm=0.01;    # Membrane Capcitance uF/cm^2
+dt=1;     # Time Step ms
+I=.1;       #External Current Applied
+ENa=55.17;  # mv Na reversal potential
+EK=-72.14;  # mv K reversal potential
+El=-49.42;  # mv Leakage reversal potential
+gbarNa=1.2; # mS/cm^2 Na conductance
+gbarK=0.36; # mS/cm^2 K conductance
+gbarl=0.003 # mS/cm^2 Leakage conductance
+t=(seq(0,100,by=dt)) #Time Array ms
+
+v=(seq(-100,200,by=dt))
+ # Initial Membrane voltage
+
+
+am = function(v){ 0.1*(-v + 25)/(exp((-v + 25)/10) - 1) }
+bm = function(v) {4*exp(-v/80)}
+m=am(v)/(am(v)+bm(v)); # Initial m-value
+
+ah = function(v){ 0.07*exp(-v/20)}
+bh = function(v) {1/(exp((-v+30)/10)+1)}
+h=   ah(v)/(ah(v) + bh(v))
+
+
+
+plot(v,m)
+lines(v,n,col="green", type="l",lwd=2.5)
+lines(v,h,col="blue", type = "l", lwd=2.5)
+
+text(x=50,y=.6, label = "h")
+text(x=65,y=.6, label = "n")
+text(x=85,y=.6, label = "m")
+
+
+ 
+
+@
+
+
+
+
+
+
+\end{document}
